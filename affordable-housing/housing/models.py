@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class House(models.Model):
-    oid = models.AutoField(primary_key=True)
+    oid = models.AutoField(primary_key=True, default=1)
     rent = models.DecimalField(max_digits=8, decimal_places=2, default=1000.00) 
     beds = models.IntegerField(default=3)
     baths = models.IntegerField(default=3)
