@@ -9,5 +9,5 @@ class House(models.Model):
     square_feet = models.IntegerField(default=1000, null=True)
     address = models.CharField(default="", max_length=255)
     description = models.TextField(default="")
-    moreInfo = models.URLField(max_length=200, blank=True, null=True)
+    More_infomation = models.URLField(max_length=200, blank=True, null=True)
     contact = models.IntegerField(default=1234567890)

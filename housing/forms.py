@@ -10,7 +10,7 @@ class HouseForm(forms.ModelForm):
         model = House
         fields = '__all__'
 
-        labels = {
+        lables = {
             'rent': 'Monthly Rent', 
             'beds': 'Number Of Bedrooms', 
             'baths': 'Number of Bathrooms', 
@@ -18,7 +18,6 @@ class HouseForm(forms.ModelForm):
             'address': 'Address',
             'description': 'Description', 
             'contact': 'Contact Number',
-            'moreInfo': 'More Info',
         }
 
         widgets  = {
@@ -29,5 +28,5 @@ class HouseForm(forms.ModelForm):
             'address' : forms.TextInput(attrs={'placeholder': 'eg. 1800'}),
             'description' : forms.Textarea(attrs={'placeholder': 'eg. 1800'}),
             'contact' : forms.NumberInput(attrs={'placeholder': 'eg. 1800'}),
-            'moreInfo' : forms.URLInput(attrs={'placeholder': 'eg. https://example.com'})
+            'moreInfo' : forms.URLInput(attrs={'placeholder': 'eg. https://example.com'}),
         }
