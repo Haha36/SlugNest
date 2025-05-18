@@ -6,18 +6,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializer import HouseSerializer
 
-@api_view(['GET','POST'])
 def create_view(request):
     if request.method == 'POST':
-        serializer = HouseSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
-        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-    form = HouseForm()
-    template_name = 'create_view.html'
-    context = {'form': form}
-    return render(request, template_name, context)
+        form = HouseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('show_url')
+    else:
+        form = HouseForm()
+    return render(request, 'create_view.html', {'form': form})
 
 # wait for Front end to be done
 def read_view(request):
@@ -46,6 +43,13 @@ def delete_view(request, f_oid):
         return redirect('show_url') ###
     template_name = 'delete_view.html'
     context = {'obj':obj}
+    return render(request, template_name, context)
+
+def savedRead_view(request):
+    obj = House.objects.all()
+    form = HouseForm()
+    template_name = 'saved_view.html'
+    context = {'obj': obj} 
     return render(request, template_name, context)
 
 def index(request):
