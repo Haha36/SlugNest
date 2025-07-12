@@ -1,0 +1,7 @@
+{% extends "authLayout.html"%}
+
+{% block content %}
+    <p>Welcome, new user.</p>
+    <p><a href = "{% url 'login' %}">Login</a> or <a href = "{% url 'register' %}">Register</a> or <a href = "{% url 'show_url'%}">Back</a>
+
+{% endblock %}
