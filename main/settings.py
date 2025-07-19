@@ -15,15 +15,9 @@ import os
 from dotenv import load_dotenv
 from django.urls import reverse_lazy
 
-# Load environment variables from .env file (like process.env in Node.js)
 load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# This is the root directory of your project
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-# Static files configuration (CSS, JS, images)
-# These are like your public/assets folder in a frontend project
 STATICFILES_DIRS = [BASE_DIR / "housing"/ "static",]
 STATIC_URL = "/static/"
 
@@ -31,64 +25,53 @@ STATIC_URL = "/static/"
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# This is like your JWT secret or API key - keep it private!
 SECRET_KEY = "django-insecure-9oaz*m_ramksjs_l@6r6@n+t-y+x^@0w@m=t#t^j+_v-(^+nhx"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Debug mode shows detailed error pages (like development mode)
 DEBUG = True
 
-# Allowed hosts - domains that can access your Django app
-# Empty list means only localhost (like CORS settings)
 ALLOWED_HOSTS = []
 
 # Site ID for django.contrib.sites
-# Used for multi-site functionality
 SITE_ID = 1
 
 
 # Application definition
-# These are like "plugins" or "packages" that add functionality to your app
+
 INSTALLED_APPS = [
-    "django.contrib.admin",        # Built-in admin interface
-    "django.contrib.auth",         # User authentication system
-    "django.contrib.contenttypes", # Content type framework
-    "django.contrib.sessions",     # Session management
-    "django.contrib.messages",     # Flash messages system
-    "django.contrib.staticfiles",  # Static file serving
-    "django.contrib.sites",        # Site framework
-    "housing",                     # Your custom app
-    'crispy_forms',               # Better form styling
-    'crispy_bootstrap5',          # Bootstrap 5 integration
-    'rest_framework'              # API framework (like Express.js)
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "housing",
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'rest_framework'
 ]
 
-# Crispy forms configuration - makes forms look better
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-# Middleware - these are like "middleware" in Express.js
-# They process requests before they reach your views
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",      # Security headers
-    "django.contrib.sessions.middleware.SessionMiddleware", # Session handling
-    "django.middleware.common.CommonMiddleware",          # Common functionality
-    "django.middleware.csrf.CsrfViewMiddleware",          # CSRF protection
-    "django.contrib.auth.middleware.AuthenticationMiddleware", # User auth
-    "django.contrib.messages.middleware.MessageMiddleware",    # Flash messages
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",  # Clickjacking protection
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Main URL configuration file
 ROOT_URLCONF = "main.urls"
 
-# Template configuration
-# This tells Django where to find your HTML templates
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-                 BASE_DIR / 'housing' / 'templates'],  # Template directory
-        "APP_DIRS": True,  # Look for templates in app directories
+                 BASE_DIR / 'housing' / 'templates'],
+        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -100,22 +83,23 @@ TEMPLATES = [
     },
 ]
 
-# WSGI application entry point
 WSGI_APPLICATION = "main.wsgi.application"
 
 
-# Database configuration
-# This is like your database connection string
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",  # Database type (SQLite)
-        "NAME": BASE_DIR / "db.sqlite3",         # Database file location
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
 
-# Password validation rules
-# These are like password requirements in your frontend forms
+# Password validation
+# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -132,38 +116,39 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization settings
-# Language and timezone configuration
+# Internationalization
+# https://docs.djangoproject.com/en/5.1/topics/i18n/
+
 LANGUAGE_CODE = "en-us"
+
 TIME_ZONE = "UTC"
+
 USE_I18N = True
+
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# URL prefix for static files
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
+
 STATIC_URL = "static/"
 
 # Default primary key field type
-# This is like the default ID field type for models
+# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Login redirect URL
-# Where to send users after they log in
 LOGIN_REDIRECT_URL = reverse_lazy('show_url')
 
-# Email configuration for password reset
-# Get email credentials from environment variables (like .env file)
 mail = os.environ.get("MAIL")
 mail_pass = os.environ.get("MAIL_PASS")
 
-# Email backend configuration
-# This is like your email service setup (SendGrid, etc.)
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'      # Email provider
-EMAIL_PORT = 587                   # SMTP port
-EMAIL_USE_TLS = True               # Use TLS encryption
-EMAIL_HOST_USER = mail             # Email username
-EMAIL_HOST_PASSWORD = mail_pass    # Email password
-DEFAULT_FROM_EMAIL = mail          # Default sender email
-EMAIL__SUBJECT_PREFIX = 'Password Recovery'  # Email subject prefix
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = mail
+EMAIL_HOST_PASSWORD = mail_pass
+DEFAULT_FROM_EMAIL = mail
+EMAIL__SUBJECT_PREFIX = 'Password Recovery'
