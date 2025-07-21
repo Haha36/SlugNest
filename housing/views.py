@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .serializer import HouseSerializer
-from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm,  UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib import messages 
@@ -103,36 +103,36 @@ def savedRead_view(request):
     context = {'obj': obj} 
     return render(request, template_name, context)
 
-#def login_view(request):
+# def login_view(request):
     """
     Handles user login (currently commented out - using Django's built-in login)
     - Authenticates username/password
     - Creates user session if credentials are valid
     """
-    template_name = 'registration/login.html' 
-    form = AuthenticationForm() 
+   # template_name = 'registration/login.html' 
+   # form = AuthenticationForm() 
 
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            # Extract username and password from form
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
+    #if request.method == 'POST':
+    #     form = AuthenticationForm(request, data=request.POST)
+    #     if form.is_valid():
+    #         # Extract username and password from form
+    #         username = form.cleaned_data.get('username')
+    #         password = form.cleaned_data.get('password')
 
-            # Check if username/password combination is valid
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                # Log the user in (creates session)
-                login(request, user)
-                messages.success(request, f"Welcome, {username}!")
-                return redirect(settings.LOGIN_REDIRECT_URL) 
-            else:
-                messages.error(request, "Invalid username or password.")
-        else:
-            messages.error(request, "Please correct the errors below.")
+    #         # Check if username/password combination is valid
+    #         user = authenticate(request, username=username, password=password)
+    #         if user is not None:
+    #             # Log the user in (creates session)
+    #             login(request, user)
+    #             messages.success(request, f"Welcome, {username}!")
+    #             return redirect(settings.LOGIN_REDIRECT_URL) 
+    #         else:
+    #             messages.error(request, "Invalid username or password.")
+    #     else:
+    #         messages.error(request, "Please correct the errors below.")
 
-    context = {'form': form}
-    return render(request, template_name, context)
+    # context = {'form': form}
+    # return render(request, template_name, context)
 
 def index(request):
     """
@@ -152,10 +152,10 @@ def custom_password_reset(request):
             # Send password reset email
             form.save()
             return redirect('password_reset_done')
-    else:
-        form = PasswordResetForm()
+    #else:
+        #form = PasswordResetForm()
     
-    return render(request, 'registration/password_reset_form.html', {'form': form})
+    return render(request, 'registration/password_reset.html')
 
 class RegistrationForm(UserCreationForm):
     """
