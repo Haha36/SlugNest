@@ -2,10 +2,16 @@
 # Each path() below maps a URL to a specific view function
 # Think of this as the "routing table" that tells Django what to do for each URL
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
 from django.contrib.auth import views as auth_views
 from . import views
 
+router = DefaultRouter()
+
+
 urlpatterns = [
+    path('api/', include(router.urls)),
     # House management URLs
     # create/ - Shows form to add new house listing
     path('create/', views.create_view, name='create_url'),
