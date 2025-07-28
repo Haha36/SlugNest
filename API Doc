@@ -1,0 +1,33 @@
+House Listings API 
+---------------------------------------------------------------
+GET /api/listings/
+Description: Retrieve a list of all house listings.
+Response:
+    200 OK
+---------------------------------------------------------------
+POST /api/listings/
+Description: Create a new house listing.
+Response:
+    201 Created
+    Returns the created house object.
+---------------------------------------------------------------
+GET /api/listings/{id}/
+Description: Retrieve details of a specific house listing.
+Response:
+    200 OK
+---------------------------------------------------------------
+PUT /api/listings/{id}/
+Description: Update an existing house listing (all fields).
+Response:
+    200 OK
+---------------------------------------------------------------
+PATCH /api/listings/{id}/
+Description: Update an existing house listing (partial update).
+Response:
+    200 OK
+    Returns the updated house object.
+---------------------------------------------------------------
+DELETE /api/listings/{id}/
+Description: Delete a house listing.
+Response:
+    204 No Content
