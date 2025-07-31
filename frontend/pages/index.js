@@ -1,3 +1,8 @@
 export default function Home() {
-  return <> </>;
+  return (
+    <>
+      {" "}
+      <p>This is the home page</p>
+    </>
+  );
 }
