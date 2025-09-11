@@ -49,12 +49,14 @@ INSTALLED_APPS = [
     "housing",
     'crispy_forms',
     'crispy_bootstrap5',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -152,3 +154,23 @@ EMAIL_HOST_USER = mail
 EMAIL_HOST_PASSWORD = mail_pass
 DEFAULT_FROM_EMAIL = mail
 EMAIL__SUBJECT_PREFIX = 'Password Recovery'
+
+# CORS settings to allow Next.js frontend to communicate with Django backend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Next.js default port
+    "http://127.0.0.1:3000",
+]
+
+# For development, you can use CORS_ALLOW_ALL_ORIGINS = True
+# But it's more secure to specify allowed origins as above
+CORS_ALLOW_CREDENTIALS = True
+
+# REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # For development - change in production
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+}

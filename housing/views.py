@@ -7,6 +7,7 @@ from .forms import HouseForm
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import viewsets
 from .serializer import HouseSerializer
 from django.contrib.auth.forms import AuthenticationForm,  UserCreationForm
 from django.contrib.auth.models import User
@@ -184,3 +185,60 @@ def registration_view(request):
     else:
         form = RegistrationForm()
     return render(request, "registration/register.html", {'form':form})
+
+# API ViewSets for REST API endpoints
+class HouseViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows houses to be viewed, created, edited or deleted.
+    This provides a full REST API for house management:
+    - GET /api/houses/ - List all houses
+    - POST /api/houses/ - Create a new house
+    - GET /api/houses/{id}/ - Get a specific house
+    - PUT /api/houses/{id}/ - Update a specific house
+    - DELETE /api/houses/{id}/ - Delete a specific house
+    """
+    queryset = House.objects.all()
+    serializer_class = HouseSerializer
+
+# Alternative: Function-based API views (if you prefer this approach)
+@api_view(['GET', 'POST'])
+def house_list_create(request):
+    """
+    List all houses, or create a new house.
+    """
+    if request.method == 'GET':
+        houses = House.objects.all()
+        serializer = HouseSerializer(houses, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = HouseSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def house_detail(request, pk):
+    """
+    Retrieve, update or delete a house instance.
+    """
+    try:
+        house = House.objects.get(pk=pk)
+    except House.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = HouseSerializer(house)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = HouseSerializer(house, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        house.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

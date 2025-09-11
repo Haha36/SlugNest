@@ -7,11 +7,17 @@ from rest_framework.routers import DefaultRouter
 from django.contrib.auth import views as auth_views
 from . import views
 
+# Router for ViewSet-based API endpoints
 router = DefaultRouter()
-
+router.register(r'houses', views.HouseViewSet)
 
 urlpatterns = [
+    # API routes using ViewSets
     path('api/', include(router.urls)),
+    
+    # Alternative: Function-based API routes (uncomment if you prefer these)
+    # path('api/houses/', views.house_list_create, name='house_list_create'),
+    # path('api/houses/<int:pk>/', views.house_detail, name='house_detail'),
     # House management URLs
     # create/ - Shows form to add new house listing
     path('create/', views.create_view, name='create_url'),
