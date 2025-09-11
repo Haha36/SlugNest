@@ -3,7 +3,10 @@ from rest_framework.routers import DefaultRouter
 from django.contrib.auth import views as auth_views
 from . import views
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d646e77ef825c2a2d5c17293fbd1afb786e14f12
 urlpatterns = [
     # savedRead - Shows user's saved houses
     path('savedRead', views.savedRead_view, name='savedRead_url'),
