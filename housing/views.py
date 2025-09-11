@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
 from .serializer import HouseSerializer
 from django.contrib.auth.forms import AuthenticationForm,  UserCreationForm
 from django.contrib.auth.models import User
@@ -18,80 +19,25 @@ from django.contrib.auth.views import PasswordResetView
 from django import forms
 from django.shortcuts import render, redirect
 
-def create_view(request):
-    """
-    Handles creating new house listings
-    - GET request: Shows the form to create a new house
-    - POST request: Saves the new house data to database
-    """
-    # Check if user is submitting form data (POST) or just viewing the form (GET)
-    if request.method == 'POST':
-        # Create form with submitted data
-        form = HouseForm(request.POST)
-        # Validate the form data
-        if form.is_valid():
-            # Save the new house to database
-            form.save()
-            # Redirect to the house listing page
-            return redirect('show_url')
-    else:
-        # Create empty form for user to fill out
-        form = HouseForm()
-    # Render the create form template with the form object
-    return render(request, 'create_view.html', {'form': form})
+class ListingsViewSet(viewsets.ModelViewSet):
+    queryset = House.objects.all()
+    serializer_class = HouseSerializer
+    permission_classes = [AllowAny]
 
-# TODO: wait for Front end to be done
-def read_view(request):
+# API ViewSet for Next.js form submissions
+class HouseViewSet(viewsets.ModelViewSet):
     """
-    Displays all house listings
-    - Gets all houses from database and shows them in a list
+    API endpoint that allows houses to be viewed, created, edited or deleted.
+    This provides a full REST API for house management:
+    - GET /api/houses/ - List all houses
+    - POST /api/houses/ - Create a new house
+    - GET /api/houses/{id}/ - Get a specific house
+    - PUT /api/houses/{id}/ - Update a specific house
+    - DELETE /api/houses/{id}/ - Delete a specific house
     """
-    # Query database for all house objects
-    obj = House.objects.all()
-    form = HouseForm()
-    template_name = 'read_view.html'
-    # Pass data to template (like props in React)
-    context = {'obj': obj} 
-    return render(request, template_name, context)
-
-def update_view(request, f_oid):
-    """
-    Handles updating existing house listings
-    - f_oid: The unique ID of the house to update (comes from URL)
-    - GET: Shows form pre-filled with current house data
-    - POST: Saves updated data to database
-    """
-    # Get the specific house from database using its ID
-    obj = House.objects.get(oid = f_oid)
-    # Create form with current house data
-    form = HouseForm(instance=obj)
-    if request.method == 'POST':
-        # Update form with new submitted data
-        form = HouseForm(request.POST, instance=obj)
-        if form.is_valid():
-            # Save changes to database
-            form.save()
-            return redirect('show_url') ###
-    template_name = 'create_view.html'
-    context = {'form': form}
-    return render(request, template_name, context) 
-
-def delete_view(request, f_oid):
-    """
-    Handles deleting house listings
-    - f_oid: The unique ID of the house to delete
-    - GET: Shows confirmation page
-    - POST: Actually deletes the house from database
-    """
-    # Get the specific house to delete
-    obj = House.objects.get(oid=f_oid)
-    if request.method == 'POST':
-        # Delete the house from database
-        obj.delete()
-        return redirect('show_url') ###
-    template_name = 'delete_view.html'
-    context = {'obj':obj}
-    return render(request, template_name, context)
+    queryset = House.objects.all()
+    serializer_class = HouseSerializer
+    permission_classes = [AllowAny]
 
 def savedRead_view(request):
     """
@@ -104,36 +50,36 @@ def savedRead_view(request):
     context = {'obj': obj} 
     return render(request, template_name, context)
 
-# def login_view(request):
+def login_view(request):
     """
     Handles user login (currently commented out - using Django's built-in login)
     - Authenticates username/password
     - Creates user session if credentials are valid
     """
-   # template_name = 'registration/login.html' 
-   # form = AuthenticationForm() 
+    template_name = 'registration/login.html' 
+    form = AuthenticationForm() 
 
-    #if request.method == 'POST':
-    #     form = AuthenticationForm(request, data=request.POST)
-    #     if form.is_valid():
-    #         # Extract username and password from form
-    #         username = form.cleaned_data.get('username')
-    #         password = form.cleaned_data.get('password')
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            # Extract username and password from form
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
 
-    #         # Check if username/password combination is valid
-    #         user = authenticate(request, username=username, password=password)
-    #         if user is not None:
-    #             # Log the user in (creates session)
-    #             login(request, user)
-    #             messages.success(request, f"Welcome, {username}!")
-    #             return redirect(settings.LOGIN_REDIRECT_URL) 
-    #         else:
-    #             messages.error(request, "Invalid username or password.")
-    #     else:
-    #         messages.error(request, "Please correct the errors below.")
+            # Check if username/password combination is valid
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                # Log the user in (creates session)
+                login(request, user)
+                messages.success(request, f"Welcome, {username}!")
+                return redirect(settings.LOGIN_REDIRECT_URL) 
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Please correct the errors below.")
 
-    # context = {'form': form}
-    # return render(request, template_name, context)
+    context = {'form': form}
+    return render(request, template_name, context)
 
 def index(request):
     """
@@ -186,59 +132,78 @@ def registration_view(request):
         form = RegistrationForm()
     return render(request, "registration/register.html", {'form':form})
 
-# API ViewSets for REST API endpoints
-class HouseViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows houses to be viewed, created, edited or deleted.
-    This provides a full REST API for house management:
-    - GET /api/houses/ - List all houses
-    - POST /api/houses/ - Create a new house
-    - GET /api/houses/{id}/ - Get a specific house
-    - PUT /api/houses/{id}/ - Update a specific house
-    - DELETE /api/houses/{id}/ - Delete a specific house
-    """
-    queryset = House.objects.all()
-    serializer_class = HouseSerializer
+#-------------------Old Views----------------------------------------
+# def create_view(request):
+# """
+# Handles creating new house listings
+# - GET request: Shows the form to create a new house
+# - POST request: Saves the new house data to database
+# """
+# # Check if user is submitting form data (POST) or just viewing the form (GET)
+# if request.method == 'POST':
+#     # Create form with submitted data
+#     form = HouseForm(request.POST)
+#     # Validate the form data
+#     if form.is_valid():
+#         # Save the new house to database
+#         form.save()
+#         # Redirect to the house listing page
+#         return redirect('show_url')
+# else:
+#     # Create empty form for user to fill out
+#     form = HouseForm()
+# # Render the create form template with the form object
+# return render(request, 'create_view.html', {'form': form})
 
-# Alternative: Function-based API views (if you prefer this approach)
-@api_view(['GET', 'POST'])
-def house_list_create(request):
-    """
-    List all houses, or create a new house.
-    """
-    if request.method == 'GET':
-        houses = House.objects.all()
-        serializer = HouseSerializer(houses, many=True)
-        return Response(serializer.data)
+# # TODO: wait for Front end to be done
+# def read_view(request):
+#     """
+#     Displays all house listings
+#     - Gets all houses from database and shows them in a list
+#     """
+#     # Query database for all house objects
+#     obj = House.objects.all()
+#     form = HouseForm()
+#     template_name = 'read_view.html'
+#     # Pass data to template (like props in React)
+#     context = {'obj': obj} 
+#     return render(request, template_name, context)
 
-    elif request.method == 'POST':
-        serializer = HouseSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# def update_view(request, f_oid):
+#     """
+#     Handles updating existing house listings
+#     - f_oid: The unique ID of the house to update (comes from URL)
+#     - GET: Shows form pre-filled with current house data
+#     - POST: Saves updated data to database
+#     """
+#     # Get the specific house from database using its ID
+#     obj = House.objects.get(oid = f_oid)
+#     # Create form with current house data
+#     form = HouseForm(instance=obj)
+#     if request.method == 'POST':
+#         # Update form with new submitted data
+#         form = HouseForm(request.POST, instance=obj)
+#         if form.is_valid():
+#             # Save changes to database
+#             form.save()
+#             return redirect('show_url') ###
+#     template_name = 'create_view.html'
+#     context = {'form': form}
+#     return render(request, template_name, context) 
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def house_detail(request, pk):
-    """
-    Retrieve, update or delete a house instance.
-    """
-    try:
-        house = House.objects.get(pk=pk)
-    except House.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = HouseSerializer(house)
-        return Response(serializer.data)
-
-    elif request.method == 'PUT':
-        serializer = HouseSerializer(house, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        house.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+# def delete_view(request, f_oid):
+#     """
+#     Handles deleting house listings
+#     - f_oid: The unique ID of the house to delete
+#     - GET: Shows confirmation page
+#     - POST: Actually deletes the house from database
+#     """
+#     # Get the specific house to delete
+#     obj = House.objects.get(oid=f_oid)
+#     if request.method == 'POST':
+#         # Delete the house from database
+#         obj.delete()
+#         return redirect('show_url') ###
+#     template_name = 'delete_view.html'
+#     context = {'obj':obj}
+#     return render(request, template_name, context)
