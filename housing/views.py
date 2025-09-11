@@ -81,7 +81,6 @@ class ListingsViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
-
     @swagger_auto_schema(
         operation_description="Update a house listing (all fields)",
         request_body=HouseSerializer,
@@ -96,7 +95,6 @@ class ListingsViewSet(viewsets.ModelViewSet):
     )
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
-
 
     @swagger_auto_schema(
         operation_description="Partially update a house listing",
@@ -113,7 +111,6 @@ class ListingsViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
 
-
     @swagger_auto_schema(
         operation_description="Delete a house listing",
         responses={
@@ -123,7 +120,6 @@ class ListingsViewSet(viewsets.ModelViewSet):
     )
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
-
 
 def savedRead_view(request):
     """
@@ -135,7 +131,6 @@ def savedRead_view(request):
     template_name = 'saved_view.html'
     context = {'obj': obj}
     return render(request, template_name, context)
-
 
 def login_view(request):
     """
