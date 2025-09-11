@@ -1,7 +1,12 @@
 node_modules/
 .venv/
+venv/
 __pycache__/
 *.py[cod]
+*.pyc
 .env
 db.sqlite3
 staticfiles/
+.DS_Store
+*.sqlite3
+/Affordable-Housing-Project/
