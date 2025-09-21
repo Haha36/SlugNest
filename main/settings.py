@@ -63,7 +63,10 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'rest_framework',
-    'drf_yasg'
+    'corsheaders',
+    'drf_yasg',
+    'djoser',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 
@@ -71,6 +74,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -184,7 +188,7 @@ mail_pass = os.environ.get("MAIL_PASS")
 
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -193,4 +197,37 @@ EMAIL_HOST_PASSWORD = mail_pass
 DEFAULT_FROM_EMAIL = mail
 EMAIL__SUBJECT_PREFIX = 'Password Recovery'
 
+# CORS settings to allow Next.js frontend to communicate with Django backend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Next.js default port
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",  # Alternative port that Next.js sometimes uses
+    "http://127.0.0.1:3001",
+]
 
+# For development, you can use CORS_ALLOW_ALL_ORIGINS = True
+# But it's more secure to specify allowed origins as above
+CORS_ALLOW_CREDENTIALS = True
+
+# REST Framework settings
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+DJOSER = {
+    "PASSWORD_RESET_CONFIRM_URL": "auth/password/reset-password-confirmation/?uid={uid}&token={token}",
+    "ACTIVATION_URL": "#/activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": False,
+    "SERIALIZERS": {},
+    "LOGIN_FIELD": "email",
+}
+
+SITE_NAME = "SlugNest"
+
+DOMAIN = 'localhost:3000'

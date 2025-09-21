@@ -19,7 +19,6 @@ from django.contrib.auth.views import PasswordResetView
 from django import forms
 from django.shortcuts import render, redirect
 
-
 class ListingsViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing house listings via REST API.
@@ -39,7 +38,6 @@ class ListingsViewSet(viewsets.ModelViewSet):
     serializer_class = HouseSerializer
     permission_classes = [AllowAny]
 
-
     @swagger_auto_schema(
         operation_description="Get all house listings",
         responses={
@@ -51,7 +49,6 @@ class ListingsViewSet(viewsets.ModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
-
 
     @swagger_auto_schema(
         operation_description="Create a new house listing",
@@ -191,35 +188,35 @@ def custom_password_reset(request):
    
     return render(request, 'registration/password_reset.html')
 
+#----------------- old authentication views---------------
+# class RegistrationForm(UserCreationForm):
+#     """
+#     Custom registration form that extends Django's built-in user creation
+#     - Adds email field to the standard username/password fields
+#     """
+#     email = forms.EmailField(required=True)
+#     class Meta:
+#         model=User
+#         fields=("username", "email", "password1", "password2")
 
-class RegistrationForm(UserCreationForm):
-    """
-    Custom registration form that extends Django's built-in user creation
-    - Adds email field to the standard username/password fields
-    """
-    email = forms.EmailField(required=True)
-    class Meta:
-        model=User
-        fields=("username", "email", "password1", "password2")
 
-
-def registration_view(request):
-    """
-    Handles new user registration
-    - GET: Shows registration form
-    - POST: Creates new user account and logs them in
-    """
-    if request.method=="POST":
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            # Create new user account
-            user = form.save()
-            # Automatically log them in
-            login(request, user)
-            return redirect('show_url')
-    else:
-        form = RegistrationForm()
-    return render(request, "registration/register.html", {'form':form})
+# def registration_view(request):
+#     """
+#     Handles new user registration
+#     - GET: Shows registration form
+#     - POST: Creates new user account and logs them in
+#     """
+#     if request.method=="POST":
+#         form = RegistrationForm(request.POST)
+#         if form.is_valid():
+#             # Create new user account
+#             user = form.save()
+#             # Automatically log them in
+#             login(request, user)
+#             return redirect('show_url')
+#     else:
+#         form = RegistrationForm()
+#     return render(request, "registration/register.html", {'form':form})
 
 
 #-------------------Old Views----------------------------------------

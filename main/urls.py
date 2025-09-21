@@ -23,6 +23,7 @@ from django.urls import re_path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from auth.views import LogoutView
 
 
 schema_view = get_schema_view(
@@ -42,8 +43,9 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("housing.urls")),  # Include housing app URLs for regular views
-    path("api/", include(("housing.routers", 'core_api'), namespace='core_api')),  
-   
+    path("auth/", include("djoser.urls")),
+    path("auth/", include("djoser.urls.jwt")),
+    path("auth/logout/", LogoutView.as_view()),
     # Swagger/OpenAPI documentation URLs
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
