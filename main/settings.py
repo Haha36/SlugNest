@@ -116,9 +116,13 @@ WSGI_APPLICATION = "main.wsgi.application"
 
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'SlugNest',
+        'USER': 'ylwzry36',
+        'PASSWORD': 'slugnest1010',
+        'HOST': 'slugnest.cziy22yem1wk.us-east-2.rds.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
