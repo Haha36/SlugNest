@@ -118,10 +118,10 @@ WSGI_APPLICATION = "main.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'SlugNest',
-        'USER': 'ylwzry36',
-        'PASSWORD': 'slugnest1010',
-        'HOST': 'slugnest.cziy22yem1wk.us-east-2.rds.amazonaws.com',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
         'PORT': '5432',
     }
 }
