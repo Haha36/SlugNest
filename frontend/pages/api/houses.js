@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     switch (req.method) {
       case "GET":
         // Get all houses or a specific house
-        const getResponse = await fetch(`${DJANGO_API_URL}/api/houses/`, {
+        const getResponse = await fetch(`${DJANGO_API_URL}/api/listings/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 
       case "POST":
         // Create a new house
-        const postResponse = await fetch(`${DJANGO_API_URL}/api/houses/`, {
+        const postResponse = await fetch(`${DJANGO_API_URL}/api/listings/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
