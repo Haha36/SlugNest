@@ -129,6 +129,7 @@ def savedRead_view(request):
     context = {'obj': obj}
     return render(request, template_name, context)
 
+#Not relate to JWT
 def login_view(request):
     """
     Handles user login (currently commented out - using Django's built-in login)
@@ -187,7 +188,6 @@ def custom_password_reset(request):
         #form = PasswordResetForm()
    
     return render(request, 'registration/password_reset.html')
-
 #----------------- old authentication views---------------
 # class RegistrationForm(UserCreationForm):
 #     """
@@ -297,6 +297,7 @@ def custom_password_reset(request):
 #     template_name = 'delete_view.html'
 #     context = {'obj':obj}
 #     return render(request, template_name, context)
+# 
 
 
 
