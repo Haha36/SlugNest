@@ -20,11 +20,11 @@ from dotenv import load_dotenv
 from django.urls import reverse_lazy
 
 
-load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATICFILES_DIRS = [BASE_DIR / "housing"/ "static",]
 STATIC_URL = "/static/"
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -115,16 +115,26 @@ WSGI_APPLICATION = "main.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': '5432',
+USE_SQLITE = os.getenv("USE_SQLITE", "true").lower() in ("true", "1", "yes")
+
+if USE_SQLITE:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
+    }
 
 
 
@@ -191,29 +201,31 @@ mail_pass = os.environ.get("MAIL_PASS")
 
 
 
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
 EMAIL_HOST_USER = mail
 EMAIL_HOST_PASSWORD = mail_pass
+
 DEFAULT_FROM_EMAIL = mail
-EMAIL__SUBJECT_PREFIX = 'Password Recovery'
+EMAIL_SUBJECT_PREFIX = 'Password Recovery'
 
 # CORS settings to allow Next.js frontend to communicate with Django backend
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Next.js default port
-    "http://127.0.0.1:3000",
-    "http://localhost:3001",  # Alternative port that Next.js sometimes uses
-    "http://127.0.0.1:3001",
-]
+# For development, allow all origins (set to False in production)
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "true").lower() in ("true", "1", "yes")
 
-# For development, you can use CORS_ALLOW_ALL_ORIGINS = True
-# But it's more secure to specify allowed origins as above
+if not CORS_ALLOW_ALL_ORIGINS:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",  
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",  # Alternative port that Next.js sometimes uses
+        "http://127.0.0.1:3001",
+    ]
+
 CORS_ALLOW_CREDENTIALS = True
 
-# REST Framework settings
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -229,9 +241,10 @@ DJOSER = {
     "ACTIVATION_URL": "#/activate/{uid}/{token}",
     "SEND_ACTIVATION_EMAIL": False,
     "SERIALIZERS": {},
-    "LOGIN_FIELD": "email",
 }
 
 SITE_NAME = "SlugNest"
 
-DOMAIN = 'localhost:3000'
+# Domain used when building full URLs in emails (password reset links, etc).
+# In development set this to your frontend (e.g. "localhost:3000"). In production set to your real frontend host.
+DOMAIN = os.getenv("DOMAIN", "localhost:3000")

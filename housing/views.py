@@ -1,15 +1,14 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import House
+from .models import House, SavedHouse
 from .forms import HouseForm
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
-from .serializer import HouseSerializer
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.views import APIView
+from .serializer import HouseSerializer, SavedHouseSerializer
 from django.contrib.auth.forms import AuthenticationForm,  UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -18,111 +17,101 @@ from django.conf import settings
 from django.contrib.auth.views import PasswordResetView
 from django import forms
 from django.shortcuts import render, redirect
+from django.core.exceptions import ObjectDoesNotExist
 
+#  ViewSet for managing house listings via REST API.
 class ListingsViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for managing house listings via REST API.
-   
-    This ViewSet provides full CRUD operations for house listings:
-    - GET /api/listings/ - List all houses
-    - POST /api/listings/ - Create a new house
-    - GET /api/listings/{id}/ - Retrieve a specific house
-    - PUT /api/listings/{id}/ - Update a house (all fields)
-    - PATCH /api/listings/{id}/ - Update a house (partial)
-    - DELETE /api/listings/{id}/ - Delete a house
-   
-    All endpoints return JSON responses and accept JSON data.
-    The 'oid' field is read-only and auto-generated.
-    """
     queryset = House.objects.all()
     serializer_class = HouseSerializer
     permission_classes = [AllowAny]
 
-    @swagger_auto_schema(
-        operation_description="Get all house listings",
-        responses={
-            200: openapi.Response(
-                description="List of all houses",
-                schema=HouseSerializer(many=True)
-            )
-        }
-    )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        operation_description="Create a new house listing",
-        request_body=HouseSerializer,
-        responses={
-            201: openapi.Response(
-                description="House created successfully",
-                schema=HouseSerializer
-            ),
-            400: "Bad Request - Invalid data"
-        }
-    )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
-
-    @swagger_auto_schema(
-        operation_description="Get a specific house listing by id",
-        responses={
-            200: openapi.Response(
-                description="House details",
-                schema=HouseSerializer
-            ),
-            404: "House not found"
-        }
-    )
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        operation_description="Update a house listing (all fields)",
-        request_body=HouseSerializer,
-        responses={
-            200: openapi.Response(
-                description="House updated successfully",
-                schema=HouseSerializer
-            ),
-            400: "Bad Request - Invalid data",
-            404: "House not found"
-        }
-    )
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        operation_description="Partially update a house listing",
-        request_body=HouseSerializer,
-        responses={
-            200: openapi.Response(
-                description="House updated successfully",
-                schema=HouseSerializer
-            ),
-            400: "Bad Request - Invalid data",
-            404: "House not found"
-        }
-    )
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        operation_description="Delete a house listing",
-        responses={
-            204: "House deleted successfully",
-            404: "House not found"
-        }
-    )
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
+# API endpoint for managing saved listings.
+class SavedListingsView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        saved_houses = SavedHouse.objects.filter(user=request.user)
+        serializer = SavedHouseSerializer(saved_houses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        house_id = request.data.get('house_id')
+        if not house_id:
+            return Response(
+                {'error': 'house_id is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            house = House.objects.get(oid=house_id)
+        except House.DoesNotExist:
+            return Response(
+                {'error': 'House not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if already saved
+        saved_house, created = SavedHouse.objects.get_or_create(
+            user=request.user,
+            house=house
+        )
+        
+        if created:
+            serializer = SavedHouseSerializer(saved_house)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(
+                {'message': 'Listing already saved'}, 
+                status=status.HTTP_200_OK
+            )
+    
+    def delete(self, request, house_id=None):
+        """Unsave a listing for the current user"""
+        if not house_id:
+            house_id = request.data.get('house_id')
+        
+        if not house_id:
+            return Response(
+                {'error': 'house_id is required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            saved_house = SavedHouse.objects.get(
+                user=request.user,
+                house__oid=house_id
+            )
+            saved_house.delete()
+            return Response(
+                {'message': 'Listing unsaved successfully'}, 
+                status=status.HTTP_200_OK
+            )
+        except SavedHouse.DoesNotExist:
+            return Response(
+                {'error': 'Saved listing not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+# Shows saved houses for the current user
 def savedRead_view(request):
-    """
-    Shows saved houses for the current user
-    - Similar to read_view but filters for user's saved houses
-    """
     obj = House.objects.all()
     form = HouseForm()
     template_name = 'saved_view.html'
@@ -143,15 +132,12 @@ def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            # Extract username and password from form
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
 
 
-            # Check if username/password combination is valid
             user = authenticate(request, username=username, password=password)
             if user is not None:
-                # Log the user in (creates session)
                 login(request, user)
                 messages.success(request, f"Welcome, {username}!")
                 return redirect(settings.LOGIN_REDIRECT_URL)
@@ -164,29 +150,18 @@ def login_view(request):
     context = {'form': form}
     return render(request, template_name, context)
 
-
+# Homepage view
 def index(request):
-    """
-    Homepage view - just renders the main index template
-    """
     return render(request, "index.html")
 
 
 def custom_password_reset(request):
-    """
-    Handles password reset requests
-    - User enters email address
-    - System sends reset link if email exists
-    """
     if request.method == 'POST':
         form = PasswordResetForm(request.POST)
         if form.is_valid():
             # Send password reset email
             form.save()
             return redirect('password_reset_done')
-    #else:
-        #form = PasswordResetForm()
-   
     return render(request, 'registration/password_reset.html')
 #----------------- old authentication views---------------
 # class RegistrationForm(UserCreationForm):

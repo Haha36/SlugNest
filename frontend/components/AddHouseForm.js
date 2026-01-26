@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 export default function AddHouseForm() {
-  // State to manage form data - mirrors your Django House model
   const [formData, setFormData] = useState({
     rent: "",
     beds: "",
@@ -10,7 +9,7 @@ export default function AddHouseForm() {
     address: "",
     description: "",
     contact: "",
-    More_infomation: "", // Note: keeping the same field name as your Django model
+    More_information: "", // !: make surekeeping the same field name as the Django model(models.py)
   });
 
   // State for handling form submission status
@@ -42,16 +41,6 @@ export default function AddHouseForm() {
         body: JSON.stringify(formData),
       });
 
-      // Alternative: Submit directly to Django backend
-      // const response = await fetch('http://localhost:8000/api/houses/', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     // Add authentication headers if needed
-      //   },
-      //   body: JSON.stringify(formData)
-      // });
-
       if (response.ok) {
         setSubmitMessage("House added successfully!");
         // Reset form
@@ -63,7 +52,7 @@ export default function AddHouseForm() {
           address: "",
           description: "",
           contact: "",
-          More_infomation: "",
+          More_information: "",
         });
       } else {
         setSubmitMessage("Error adding house. Please try again.");
@@ -113,18 +102,18 @@ export default function AddHouseForm() {
             step="0.01"
             min="0"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
         </div>
 
-        {/* Bedrooms and Bathrooms - Side by side */}
+        {/* Bedrooms and Bathrooms */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label
               htmlFor="beds"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Number Of Bedrooms
+              Number of Bedrooms
             </label>
             <input
               type="number"
@@ -135,7 +124,7 @@ export default function AddHouseForm() {
               placeholder="eg. 3"
               min="0"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
 
@@ -155,7 +144,7 @@ export default function AddHouseForm() {
               placeholder="eg. 2"
               min="0"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -176,7 +165,7 @@ export default function AddHouseForm() {
             onChange={handleChange}
             placeholder="eg. 1200"
             min="0"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
         </div>
 
@@ -196,7 +185,7 @@ export default function AddHouseForm() {
             onChange={handleChange}
             placeholder="eg. 123 Main St, City, State 12345"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
         </div>
 
@@ -216,43 +205,43 @@ export default function AddHouseForm() {
             placeholder="Describe the property features, amenities, etc."
             rows="4"
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
         </div>
 
-        {/* Contact Number */}
+        {/* Contact Information */}
         <div>
           <label
             htmlFor="contact"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Contact Number
+            Contact Information
           </label>
           <input
-            type="tel"
+            type="text"
             id="contact"
             name="contact"
             value={formData.contact}
             onChange={handleChange}
-            placeholder="eg. 1234567890"
+            placeholder="eg. Number, Email, or Social Media etc."
             required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           />
         </div>
 
         {/* More Information URL */}
         <div>
           <label
-            htmlFor="More_infomation"
+            htmlFor="More_information"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
             More Information (Optional URL)
           </label>
           <input
             type="url"
-            id="More_infomation"
-            name="More_infomation"
-            value={formData.More_infomation}
+            id="More_information"
+            name="More_information"
+            value={formData.More_information}
             onChange={handleChange}
             placeholder="eg. https://example.com"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -267,7 +256,7 @@ export default function AddHouseForm() {
             className={`w-full py-3 px-4 rounded-md font-medium text-white transition-colors ${
               isSubmitting
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                : "bg-amber-500 hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
             }`}
           >
             {isSubmitting ? "Adding House..." : "Add House Listing"}

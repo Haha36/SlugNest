@@ -1,13 +1,9 @@
-// Next.js API route for house operations
-// This acts as a proxy/middleware between your frontend and Django backend
 
 export default async function handler(req, res) {
-  // Set CORS headers if needed
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle preflight requests
   if (req.method === "OPTIONS") {
     res.status(200).end();
     return;

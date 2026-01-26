@@ -1,6 +1,3 @@
-# Django URL Configuration - This file defines the website's URL structure
-# Each path() below maps a URL to a specific view function
-# Think of this as the "routing table" that tells Django what to do for each URL
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from django.contrib.auth import views as auth_views
@@ -14,18 +11,21 @@ urlpatterns = [
     # API routes using ViewSets
     path('api/', include(router.urls)),
     
-    # savedRead - Shows user's saved houses
+    # Saved listings API endpoints
+    path('api/saved/', views.SavedListingsView.as_view(), name='saved-listings'),
+    path('api/saved/<int:house_id>/', views.SavedListingsView.as_view(), name='unsave-listing'),
+    
+    # Shows user's saved houses
     path('savedRead', views.savedRead_view, name='savedRead_url'),
     
-    # Password reset URLs - Django's built-in password reset functionality
-    # password_reset/ - Form to enter email for password reset
+    # Not relate to JWT
     path(
         'password_reset/',
         views.custom_password_reset,
         name='password_reset'
     ),
     
-    # password_reset/done/ - Confirmation page after email is sent
+    # Confirmation page after email is sent for password reset
     path(
         'password_reset/done/',
         auth_views.PasswordResetDoneView.as_view(
@@ -34,8 +34,7 @@ urlpatterns = [
         name='password_reset_done'
     ),
     
-    # reset/<uidb64>/<token>/ - Link in email that user clicks to reset password
-    # uidb64 and token are security parameters to verify the reset request
+    # Link in email that user clicks to reset password
     path(
         'reset/<uidb64>/<token>/',
         auth_views.PasswordResetConfirmView.as_view(
@@ -44,7 +43,7 @@ urlpatterns = [
         name='password_reset_confirm'
     ),
     
-    # reset/done/ - Success page after password is reset
+    # Success page after password is reset
     path(
         'reset/done/',
         auth_views.PasswordResetCompleteView.as_view(
@@ -53,7 +52,7 @@ urlpatterns = [
         name='password_reset_complete'
     ),
     
-    # Authentication URLs - Django's built-in login/logout functionality
+    # Authentication URLs 
     # login/ - User login form
     path('login/', auth_views.LoginView.as_view(), name='login'),
     
