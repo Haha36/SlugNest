@@ -14,7 +14,7 @@ export default function Home() {
           throw new Error("Failed to fetch data");
         }
         const data = await response.json();
-        // For feature page, sort by id in descending order and take only the 6 newest listings
+        // For feature page, sort by id in descending order and show only the 6 newest listings
         const sorted = data.sort((a, b) => b.oid - a.oid).slice(0, 6);
         setFeatured(sorted);
       } catch (error) {

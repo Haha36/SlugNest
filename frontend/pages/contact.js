@@ -29,14 +29,14 @@ export default function ContactPage() {
             <div>
               <h4 className="font-semibold text-slate-900 mb-2">Questions</h4>
               <p className="text-slate-600">
-                Have a question about our service, listings, or how SlugNest works? We're happy to help!
+                Have a question about our service, listings, or how SlugNest works? 
               </p>
             </div>
 
             <div>
               <h4 className="font-semibold text-slate-900 mb-2">Cooperate With Us</h4>
               <p className="text-slate-600">
-                Interested in partnering with SlugNest? We'd love to explore collaboration opportunities!
+                Interested in advertising or partnering with SlugNest? We'd love to explore collaboration opportunities!
               </p>
             </div>
           </div>
