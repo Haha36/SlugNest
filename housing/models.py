@@ -23,7 +23,7 @@ class House(models.Model):
     # URL field for additional information link (optional)
     More_information = models.URLField(max_length=200, blank=True, null=True)
     
-    contact = models.CharField(default="Number, Email, or Social Media etc.")
+    contact = models.CharField(max_length=255,default="Number, Email, or Social Media etc.")
 
 # tracks which houses users have saved
 class SavedHouse(models.Model):
