@@ -9,7 +9,7 @@ export default function Home() {
   useEffect(() => {
     async function loadFeatured() {
       try {
-        const response = await fetch("/api/houses");
+        const response = await fetch("/api/listings");
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -46,12 +46,14 @@ export default function Home() {
             >
               View Listings
             </Link>
-            <Link
+{/*
+             <Link
               href="/add-house"
               className="rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-slate-700 transition hover:bg-amber-50"
             >
               Add a Home
-            </Link>
+            </Link> 
+*/}
           </div>
         </section>
 

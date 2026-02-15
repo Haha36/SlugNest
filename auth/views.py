@@ -54,7 +54,7 @@ class PasswordRecoveryView(APIView):
                 )
                 domain = getattr(settings, "DOMAIN", "localhost")
                 # Ensure there's no duplicate slashes
-                reset_url = f"http://{domain}/{reset_path.format(uid=uid, token=token)}"
+                reset_url = f"https://{domain}/{reset_path.format(uid=uid, token=token)}"
 
                 subject = f"Account recovery for {getattr(settings, 'SITE_NAME', 'Site')}"
                 message = (

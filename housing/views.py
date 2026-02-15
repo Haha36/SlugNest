@@ -21,7 +21,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 #  ViewSet for managing house listings via REST API.
 class ListingsViewSet(viewsets.ModelViewSet):
-    queryset = House.objects.all()
+    queryset = House.objects.all().order_by('-oid')
     serializer_class = HouseSerializer
     permission_classes = [AllowAny]
 

@@ -82,7 +82,7 @@ export default function ListingsPage() {
 
     async function fetchHouses() {
       try {
-        const response = await fetch("/api/houses");
+        const response = await fetch("/api/listings/");
         if (!response.ok) {
           throw new Error("Unable to load listings. Please try again later.");
         }
