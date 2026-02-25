@@ -10,3 +10,4 @@ staticfiles/
 .DS_Store
 *.sqlite3
 /Affordable-Housing-Project/
+.env
