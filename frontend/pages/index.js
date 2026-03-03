@@ -9,7 +9,7 @@ export default function Home() {
   useEffect(() => {
     async function loadFeatured() {
       try {
-        const response = await fetch("/api/listings");
+        const response = await fetch("/api/listings/");
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
