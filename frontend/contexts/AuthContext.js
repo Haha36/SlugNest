@@ -16,19 +16,44 @@ export function AuthProvider({ children }) {
     
     if (storedToken && storedRefresh) {
       setToken(storedToken);
-      // Optionally verify token is still valid by fetching user info
-      verifyToken(storedToken);
+      verifyToken();
     } else {
       setLoading(false);
     }
   }, []);
 
-  const verifyToken = async (tokenToVerify) => {
+  const refreshAccessToken = async () => {
+    const storedRefresh = localStorage.getItem('refresh_token');
+    if (!storedRefresh) return null;
+
     try {
-      setToken(tokenToVerify);
-      setUser({ authenticated: true });
+      const response = await fetch(`${DJANGO_API_URL}/auth/jwt/refresh/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh: storedRefresh }),
+      });
+
+      if (!response.ok) return null;
+
+      const { access, refresh } = await response.json();
+      localStorage.setItem('access_token', access);
+      if (refresh) localStorage.setItem('refresh_token', refresh);
+      setToken(access);
+      return access;
     } catch (error) {
-      // Token invalid, clear it
+      return null;
+    }
+  };
+
+  const verifyToken = async () => {
+    try {
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        setUser({ authenticated: true });
+      } else {
+        logout();
+      }
+    } catch (error) {
       logout();
     } finally {
       setLoading(false);
@@ -134,6 +159,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    refreshAccessToken,
     isAuthenticated: !!token,
     getAuthHeaders,
   };

@@ -15,6 +15,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 
 from pathlib import Path
+from datetime import timedelta
 import os
 from dotenv import load_dotenv
 from django.urls import reverse_lazy
@@ -228,6 +229,10 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 DJOSER = {
