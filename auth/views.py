@@ -28,6 +28,27 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class GoogleAuthView(APIView):
+    permission_classes = (AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request):
+        email = request.data.get("email", "").strip().lower()
+        if not email or not email.endswith("@ucsc.edu"):
+            return Response({"detail": "A valid @ucsc.edu email is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user, _ = User.objects.get_or_create(
+            email=email,
+            defaults={"username": email}
+        )
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+        }, status=status.HTTP_200_OK)
+
+
 class PasswordRecoveryView(APIView):
     # Accepts an email address and sends account recovery instructions.
 
