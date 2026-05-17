@@ -3,25 +3,35 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import ListingCard from "../components/Listing-card";
 import { useAuth } from "../contexts/AuthContext";
+import { useSession } from "next-auth/react";
 
 export default function SavedPage() {
   const [savedListings, setSavedListings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isAuthenticated, getAuthHeaders, loading: authLoading } = useAuth();
+  const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    if (authLoading) return;
+  const getHeaders = () => {
+    if (isAuthenticated) return getAuthHeaders();
+    if (session?.djangoAccessToken) return { Authorization: `Bearer ${session.djangoAccessToken}` };
+    return {};
+  };
 
-    if (!isAuthenticated) {
+  useEffect(() => {
+    if (authLoading || sessionStatus === "loading") return;
+
+    const isAuthed = isAuthenticated || !!session?.djangoAccessToken;
+    console.log("[saved] isAuthenticated:", isAuthenticated, "djangoAccessToken:", session?.djangoAccessToken, "isAuthed:", isAuthed);
+    if (!isAuthed) {
       router.push("/login");
       return;
     }
 
     async function fetchSavedListings() {
       try {
-        const headers = getAuthHeaders();
+        const headers = getHeaders();
         const response = await fetch("/api/saved", {
           headers,
         });
@@ -44,11 +54,11 @@ export default function SavedPage() {
     }
 
     fetchSavedListings();
-  }, [isAuthenticated, authLoading, router, getAuthHeaders]);
+  }, [isAuthenticated, authLoading, sessionStatus, session]);
 
   const handleUnsave = async (houseId) => {
     try {
-      const headers = getAuthHeaders();
+      const headers = getHeaders();
       const response = await fetch("/api/saved", {
         method: "DELETE",
         headers,
@@ -69,7 +79,7 @@ export default function SavedPage() {
     }
   };
 
-  if (authLoading || isLoading) {
+  if (authLoading || sessionStatus === "loading" || isLoading) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-rose-50 via-white to-amber-50 px-4 py-16">
         <section className="mx-auto max-w-6xl">

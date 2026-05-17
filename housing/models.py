@@ -8,8 +8,10 @@ class House(models.Model):
     This is like a database table with columns for each field below
     """
     oid = models.AutoField(primary_key=True)
-    
-    rent = models.DecimalField(max_digits=8, decimal_places=2, default=1000.00) 
+
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='listings')
+
+    rent = models.DecimalField(max_digits=8, decimal_places=2, default=1000.00)
     
     beds = models.IntegerField(default=0)
     baths = models.IntegerField(default=0)

@@ -1,20 +1,25 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSession, signOut } from "next-auth/react";
 import { useAuth } from "../contexts/AuthContext";
 
 const navLinks = [
   { href: "/listings", label: "Listings" },
   { href: "/saved", label: "Saved" },
-  // { href: "/add-house", label: "Add House" },
+  { href: "/my-listings", label: "My Listings" },
   { href: "/contact", label: "Contact Us" },
 ];
 
 export default function Navbar() {
   const { isAuthenticated, logout } = useAuth();
+  const { data: session } = useSession();
   const router = useRouter();
+
+  const loggedIn = isAuthenticated || !!session;
 
   const handleLogout = async () => {
     await logout();
+    if (session) await signOut({ redirect: false });
     router.push("/");
   };
 
@@ -40,7 +45,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {isAuthenticated ? (
+        {loggedIn ? (
           <button
             onClick={handleLogout}
             className="rounded-full border border-amber-200 px-4 py-2 text-sm font-semibold text-amber-700 transition hover:border-amber-500 hover:text-amber-600 hover:bg-amber-50"

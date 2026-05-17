@@ -7,7 +7,7 @@ class HouseSerializer(serializers.ModelSerializer):
     class Meta:
         model = House
         fields = '__all__'
-        read_only_fields = ['oid']
+        read_only_fields = ['oid', 'owner']
 
 # This serializer handles saved listings for users.
 class SavedHouseSerializer(serializers.ModelSerializer):

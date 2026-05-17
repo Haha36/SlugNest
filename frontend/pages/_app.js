@@ -1,10 +1,12 @@
 import Navbar from "../components/Navbar";
 import "../styles/global.css";
 import { AuthProvider } from "../contexts/AuthContext";
+import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   return (
+    <SessionProvider session={session}>
     <AuthProvider>
       <Head>
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -22,6 +24,7 @@ function MyApp({ Component, pageProps }) {
       <Navbar />
       <Component {...pageProps} />
     </AuthProvider>
+    </SessionProvider>
   );
 }
 

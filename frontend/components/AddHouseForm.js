@@ -1,15 +1,17 @@
 import { useState } from "react";
 
-export default function AddHouseForm() {
+export default function AddHouseForm({ token, onSuccess }) {
   const [formData, setFormData] = useState({
     rent: "",
     beds: "",
     baths: "",
     square_feet: "",
     address: "",
+    distanceByCar: "",
+    distanceByBus: "",
     description: "",
     contact: "",
-    More_information: "", // !: make surekeeping the same field name as the Django model(models.py)
+    More_information: "", 
   });
 
   // State for handling form submission status
@@ -33,27 +35,45 @@ export default function AddHouseForm() {
 
     try {
       // Submit to Next.js API route (which then forwards to Django)
+      const distanceSentence = `Distance to UCSC: ${formData.distanceByCar} minutes by car or ${formData.distanceByBus} minutes by bus.`;
+      const payload = {
+        ...formData,
+        square_feet: formData.square_feet === "" ? null : formData.square_feet,
+        description: formData.description
+          ? `${formData.description} ${distanceSentence}`
+          : distanceSentence,
+      };
+      delete payload.distanceByCar;
+      delete payload.distanceByBus;
+
       const response = await fetch("/api/houses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        setSubmitMessage("House added successfully!");
-        // Reset form
-        setFormData({
-          rent: "",
-          beds: "",
-          baths: "",
-          square_feet: "",
-          address: "",
-          description: "",
-          contact: "",
-          More_information: "",
-        });
+        const newHouse = await response.json();
+        if (onSuccess) {
+          onSuccess(newHouse);
+        } else {
+          setSubmitMessage("House added successfully!");
+          setFormData({
+            rent: "",
+            beds: "",
+            baths: "",
+            square_feet: "",
+            address: "",
+            distanceByCar: "",
+            distanceByBus: "",
+            description: "",
+            contact: "",
+            More_information: "",
+          });
+        }
       } else {
         setSubmitMessage("Error adding house. Please try again.");
       }
@@ -66,9 +86,9 @@ export default function AddHouseForm() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="max-w-2xl mx-auto p-4 sm:p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Add New House Listing
+        Add New Short Term/Sublet Listing
       </h2>
 
       {submitMessage && (
@@ -189,6 +209,53 @@ export default function AddHouseForm() {
           />
         </div>
 
+        {/* Distance to UCSC */}
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <label className="block text-sm font-medium text-gray-700">
+              Distance to UCSC
+            </label>
+            <a
+              href="https://www.google.com/maps/dir//University+of+California+Santa+Cruz/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-blue-500 hover:text-blue-700 underline"
+            >
+              Check on Google Maps
+            </a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                id="distanceByCar"
+                name="distanceByCar"
+                value={formData.distanceByCar}
+                onChange={handleChange}
+                placeholder="eg. 10"
+                min="0"
+                required
+                className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+              <span className="text-sm text-gray-600 whitespace-nowrap">min by car</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                id="distanceByBus"
+                name="distanceByBus"
+                value={formData.distanceByBus}
+                onChange={handleChange}
+                placeholder="eg. 20"
+                min="0"
+                required
+                className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+              <span className="text-sm text-gray-600 whitespace-nowrap">min by bus</span>
+            </div>
+          </div>
+        </div>
+
         {/* Description */}
         <div>
           <label
@@ -202,7 +269,7 @@ export default function AddHouseForm() {
             name="description"
             value={formData.description}
             onChange={handleChange}
-            placeholder="Describe the property features, amenities, etc."
+            placeholder="Describe the property features, included utilities, amenities, etc."
             rows="4"
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
