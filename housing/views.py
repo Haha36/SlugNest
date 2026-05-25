@@ -26,9 +26,13 @@ class ListingsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
+        queryset = House.objects.all().order_by('-oid')
         if self.request.query_params.get('mine') == 'true' and self.request.user.is_authenticated:
-            return House.objects.filter(owner=self.request.user).order_by('-oid')
-        return House.objects.all().order_by('-oid')
+            return queryset.filter(owner=self.request.user)
+        listing_type = self.request.query_params.get('listing_type')
+        if listing_type:
+            queryset = queryset.filter(listing_type=listing_type)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -115,7 +119,7 @@ class SavedListingsView(APIView):
                 {'error': 'Saved listing not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-
+# Functions below is no longer used
 # Shows saved houses for the current user
 def savedRead_view(request):
     obj = House.objects.all()
