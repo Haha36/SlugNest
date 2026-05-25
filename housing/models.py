@@ -27,6 +27,9 @@ class House(models.Model):
     
     contact = models.CharField(max_length=255,default="Number, Email, or Social Media etc.")
 
+    LISTING_TYPE_CHOICES = [('long_term', 'Long Term'), ('sublet', 'Sublet/Short Term')]
+    listing_type = models.CharField(max_length=20, choices=LISTING_TYPE_CHOICES, default='sublet')
+
 # tracks which houses users have saved
 class SavedHouse(models.Model):
     # on_delete=CASCADE means if user is deleted, their saved houses are also deleted
