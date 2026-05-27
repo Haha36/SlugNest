@@ -8,6 +8,7 @@ export default function ListingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [savedIds, setSavedIds] = useState(() => new Set());
+  const [filter, setFilter] = useState("all");
   const { isAuthenticated, getAuthHeaders } = useAuth();
   const router = useRouter();
 
@@ -79,10 +80,13 @@ export default function ListingsPage() {
 
   useEffect(() => {
     let isMounted = true;
+    setIsLoading(true);
+    setError(null);
 
     async function fetchHouses() {
       try {
-        const response = await fetch("/api/listings/");
+        const url = filter === "all" ? "/api/listings/" : `/api/listings/?listing_type=${filter}`;
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Unable to load listings. Please try again later.");
         }
@@ -107,7 +111,7 @@ export default function ListingsPage() {
     return () => {
       isMounted = false;
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, filter]);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white px-4 py-12">
@@ -136,6 +140,24 @@ export default function ListingsPage() {
           </p>
         )}
 
+        {!isLoading && !error && (
+          <div className="mb-6 flex justify-center gap-2">
+            {["all", "sublet", "long_term"].map((type) => (
+              <button
+                key={type}
+                onClick={() => setFilter(type)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  filter === type
+                    ? "bg-amber-500 text-white"
+                    : "bg-white text-slate-600 border border-slate-200 hover:bg-amber-50"
+                }`}
+              >
+                {type === "all" ? "All" : type === "sublet" ? "Sublet / Short Term" : "Long Term"}
+              </button>
+            ))}
+          </div>
+        )}
+
         {!isLoading && !error && houses.length === 0 && (
           <p className="rounded-2xl bg-white px-4 py-3 text-center text-slate-500 shadow-sm">
             No listings found. Try adding a new home.
@@ -144,13 +166,13 @@ export default function ListingsPage() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {houses.map((house) => (
-            <ListingCard
-              key={house.oid}
-              house={house}
-              isSaved={savedIds.has(house.oid)}
-              onToggleSave={() => toggleSaved(house.oid)}
-            />
-          ))}
+              <ListingCard
+                key={house.oid}
+                house={house}
+                isSaved={savedIds.has(house.oid)}
+                onToggleSave={() => toggleSaved(house.oid)}
+              />
+            ))}
         </div>
       </section>
     </main>

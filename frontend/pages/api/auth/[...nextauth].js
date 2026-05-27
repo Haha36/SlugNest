@@ -17,27 +17,51 @@ export default NextAuth({
     },
 
     async jwt({ token, account, profile }) {
+      // On first login, fetch Django tokens and store with expiry
       if (account && profile) {
         try {
-          console.log("[NextAuth] Fetching Django token for:", profile.email);
           const res = await fetch(`${DJANGO_API_URL}/auth/google-token/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: profile.email }),
           });
-          console.log("[NextAuth] Django response status:", res.status);
           if (res.ok) {
             const data = await res.json();
             token.djangoAccessToken = data.access;
-            console.log("[NextAuth] Django token stored successfully");
-          } else {
-            const text = await res.text();
-            console.log("[NextAuth] Django error response:", text);
+            token.djangoRefreshToken = data.refresh;
+            // Store expiry 55 min from now (before the 1hr Django expiry)
+            token.djangoAccessTokenExpiry = Date.now() + 55 * 60 * 1000;
           }
         } catch (e) {
           console.log("[NextAuth] Django fetch failed:", e.message);
         }
       }
+
+      // Access token still valid — return as-is
+      if (Date.now() < token.djangoAccessTokenExpiry) {
+        return token;
+      }
+
+      // Access token expired — use refresh token to get a new one
+      try {
+        const res = await fetch(`${DJANGO_API_URL}/auth/jwt/refresh/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh: token.djangoRefreshToken }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          token.djangoAccessToken = data.access;
+          token.djangoAccessTokenExpiry = Date.now() + 55 * 60 * 1000;
+        } else {
+          // Refresh token also expired — force re-login
+          token.djangoAccessToken = null;
+          token.djangoRefreshToken = null;
+        }
+      } catch (e) {
+        console.log("[NextAuth] Token refresh failed:", e.message);
+      }
+
       return token;
     },
 

@@ -38,6 +38,7 @@ export default function AddHouseForm({ token, onSuccess }) {
       const distanceSentence = `Distance to UCSC: ${formData.distanceByCar} minutes by car or ${formData.distanceByBus} minutes by bus.`;
       const payload = {
         ...formData,
+        listing_type: 'sublet',
         square_feet: formData.square_feet === "" ? null : formData.square_feet,
         description: formData.description
           ? `${formData.description} ${distanceSentence}`
@@ -87,9 +88,12 @@ export default function AddHouseForm({ token, onSuccess }) {
 
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">
         Add New Short Term/Sublet Listing
       </h2>
+      <p className="text-sm text-slate-500 mb-6">
+        Listings are automatically removed after 60 days. Contact us if you need your listing to stay longer.
+      </p>
 
       {submitMessage && (
         <div

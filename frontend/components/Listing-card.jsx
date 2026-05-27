@@ -55,7 +55,13 @@ export default function ListingCard({ house, isSaved = false, onToggleSave }) {
           </p>
         </div>
 
-        <div className="flex items-center gap-4 text-sm font-medium text-slate-600">
+        {/*  Tags on Card */}
+        <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-slate-600">
+          {house.listing_type === "sublet" && (
+            <span className="rounded-full bg-orange-50 px-3 py-1 text-orange-700">
+              Sublet/Short Term
+            </span>
+          )}
           <span className="rounded-full bg-orange-50 px-3 py-1 text-orange-700">
             {house.beds} beds
           </span>
