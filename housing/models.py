@@ -30,6 +30,9 @@ class House(models.Model):
     LISTING_TYPE_CHOICES = [('long_term', 'Long Term'), ('sublet', 'Sublet/Short Term')]
     listing_type = models.CharField(max_length=20, choices=LISTING_TYPE_CHOICES, default='sublet')
 
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    auto_delete = models.BooleanField(default=True)
+
 # tracks which houses users have saved
 class SavedHouse(models.Model):
     # on_delete=CASCADE means if user is deleted, their saved houses are also deleted
