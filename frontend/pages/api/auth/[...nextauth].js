@@ -37,8 +37,8 @@ export default NextAuth({
         }
       }
 
-      // Access token still valid — return as-is
-      if (Date.now() < token.djangoAccessTokenExpiry) {
+      // Access token still valid, or no refresh token available (old session) — return as-is
+      if (Date.now() < token.djangoAccessTokenExpiry || !token.djangoRefreshToken) {
         return token;
       }
 

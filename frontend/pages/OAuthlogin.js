@@ -17,7 +17,7 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-gray-800 mb-6">
           Choose a Verification Method to Continue
         </h1>
-        {router.query.error && (
+        {router.query.error === "AccessDenied" && (
           <p className="mb-4 text-sm text-red-600 bg-red-50 rounded p-3">
             Access denied. Please use your @ucsc.edu account.
           </p>
