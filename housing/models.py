@@ -8,8 +8,10 @@ class House(models.Model):
     This is like a database table with columns for each field below
     """
     oid = models.AutoField(primary_key=True)
-    
-    rent = models.DecimalField(max_digits=8, decimal_places=2, default=1000.00) 
+
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='listings')
+
+    rent = models.DecimalField(max_digits=8, decimal_places=2, default=1000.00)
     
     beds = models.IntegerField(default=0)
     baths = models.IntegerField(default=0)
@@ -24,6 +26,12 @@ class House(models.Model):
     More_information = models.URLField(max_length=200, blank=True, null=True)
     
     contact = models.CharField(max_length=255,default="Number, Email, or Social Media etc.")
+
+    LISTING_TYPE_CHOICES = [('long_term', 'Long Term'), ('sublet', 'Sublet/Short Term')]
+    listing_type = models.CharField(max_length=20, choices=LISTING_TYPE_CHOICES, default='sublet')
+
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    auto_delete = models.BooleanField(default=True)
 
 # tracks which houses users have saved
 class SavedHouse(models.Model):

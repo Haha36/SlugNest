@@ -6,7 +6,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.views import APIView
 from .serializer import HouseSerializer, SavedHouseSerializer
 from django.contrib.auth.forms import AuthenticationForm,  UserCreationForm
@@ -21,26 +22,35 @@ from django.core.exceptions import ObjectDoesNotExist
 
 #  ViewSet for managing house listings via REST API.
 class ListingsViewSet(viewsets.ModelViewSet):
-    queryset = House.objects.all().order_by('-oid')
     serializer_class = HouseSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    def get_queryset(self):
+        queryset = House.objects.all().order_by('-oid')
+        if self.request.query_params.get('mine') == 'true' and self.request.user.is_authenticated:
+            return queryset.filter(owner=self.request.user)
+        listing_type = self.request.query_params.get('listing_type')
+        if listing_type:
+            queryset = queryset.filter(listing_type=listing_type)
+        return queryset
 
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+    def _check_owner(self, instance):
+        if instance.owner != self.request.user:
+            raise PermissionDenied("You can only modify your own listings.")
 
     def update(self, request, *args, **kwargs):
+        self._check_owner(self.get_object())
         return super().update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
+        self._check_owner(self.get_object())
         return super().partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
+        self._check_owner(self.get_object())
         return super().destroy(request, *args, **kwargs)
 
 # API endpoint for managing saved listings.
@@ -109,7 +119,7 @@ class SavedListingsView(APIView):
                 {'error': 'Saved listing not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-
+# Functions below is no longer used
 # Shows saved houses for the current user
 def savedRead_view(request):
     obj = House.objects.all()

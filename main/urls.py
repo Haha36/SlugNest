@@ -4,7 +4,7 @@ from django.urls import re_path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from auth.views import LogoutView, PasswordRecoveryView
+from auth.views import LogoutView, PasswordRecoveryView, GoogleAuthView
 
 
 schema_view = get_schema_view(
@@ -28,4 +28,5 @@ urlpatterns = [
     path("auth/", include("djoser.urls.jwt")),
     path("auth/logout/", LogoutView.as_view()),
     path("auth/recover/", PasswordRecoveryView.as_view()),
+    path("auth/google-token/", GoogleAuthView.as_view()),
 ]

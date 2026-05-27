@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -36,9 +37,6 @@ export default function LoginPage() {
             <p className="mt-2 text-sm text-slate-600">
               Sign in to save your favorite listings
             </p>
-            <p className="mt-1 text-xs text-amber-600">
-              Use your username (not email) to sign in
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -62,7 +60,7 @@ export default function LoginPage() {
                 placeholder="Enter your username"
               />
               <p className="mt-1 text-xs text-slate-500">
-                Use the username you created during registration
+                Use your username (not email) to sign in
               </p>
             </div>
 
@@ -97,13 +95,26 @@ export default function LoginPage() {
               {isLoading ? "Signing in..." : "Sign In"}
             </button>
           </form>
-
           <div className="mt-6 text-center text-sm text-slate-600">
             Don't have an account?{" "}
             <Link href="/register" className="font-semibold text-amber-600 hover:text-amber-700">
               Sign up
             </Link>
           </div>
+          <div className="my-6 flex items-center gap-4">
+            <div className="flex-1 h-px bg-slate-200" />
+            <span className="text-xs text-slate-400">or</span>
+            <div className="flex-1 h-px bg-slate-200" />
+        </div>
+
+        <button
+          onClick={() => signIn("google", { callbackUrl: "/saved" })}
+          className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-amber-50"
+        >
+          Continue with UCSC Account
+        </button>
+
+          
         </div>
       </section>
     </main>

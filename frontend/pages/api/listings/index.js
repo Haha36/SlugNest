@@ -4,7 +4,11 @@ export default async function handler(req, res) {
   try {
     switch (req.method) {
       case "GET":
-        const getResponse = await fetch(`${DJANGO_API_URL}/api/listings/`, {
+        const { listing_type } = req.query;
+        const url = listing_type
+          ? `${DJANGO_API_URL}/api/listings/?listing_type=${listing_type}`
+          : `${DJANGO_API_URL}/api/listings/`;
+        const getResponse = await fetch(url, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
