@@ -14,7 +14,7 @@ export default function AddHousePage() {
   if (status === "loading" || !session) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-rose-50 px-4 py-8">
       <div className="container mx-auto px-4">
         <AddHouseForm token={session?.djangoAccessToken} />
       </div>

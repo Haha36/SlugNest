@@ -114,7 +114,7 @@ export default function ListingsPage() {
   }, [isAuthenticated, filter]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-white px-4 py-12">
+    <main className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-rose-50 px-4 py-12">
       <section className="mx-auto max-w-6xl">
         <header className="mb-10 flex flex-col gap-3 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-600">
