@@ -4,19 +4,21 @@ import Link from "next/link";
 
 export default function Home() {
   const [featured, setFeatured] = useState([]);
+  const [featuredSublet, setFeaturedSublet] = useState([]);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     async function loadFeatured() {
       try {
-        const response = await fetch("/api/listings/");
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const data = await response.json();
-        // For feature page, sort by id in descending order and show only the 6 newest listings
-        const sorted = data.sort((a, b) => b.oid - a.oid).slice(0, 6);
-        setFeatured(sorted);
+        const [allRes, subletRes] = await Promise.all([
+          fetch("/api/listings/?listing_type=long_term"),
+          fetch("/api/listings/?listing_type=sublet"),
+        ]);
+        if (!allRes.ok || !subletRes.ok) throw new Error("Failed to fetch data");
+        const allData = await allRes.json();
+        const subletData = await subletRes.json();
+        setFeatured(allData.sort((a, b) => b.oid - a.oid).slice(0, 6));
+        setFeaturedSublet(subletData.sort((a, b) => b.oid - a.oid).slice(0, 6));
       } catch (error) {
         console.error(error);
         setHasError(true);
@@ -64,7 +66,7 @@ export default function Home() {
                 Featured
               </p>
               <h2 className="text-2xl font-semibold text-slate-900">
-                Latest Listings
+                Latest Long Term Listings
               </h2>
             </div>
             <Link
@@ -85,6 +87,42 @@ export default function Home() {
                 <ListingCard key={house.oid} house={house} />
               ))}
               {featured.length === 0 && (
+                <div className="rounded-2xl border border-dashed border-amber-200 bg-white/80 px-6 py-10 text-center text-slate-500">
+                  Listings will appear here once available.
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-amber-600">
+                Featured
+              </p>
+              <h2 className="text-2xl font-semibold text-slate-900">
+                Latest Sublet / Short Term Listings
+              </h2>
+            </div>
+            <Link
+              href="/listings?type=sublet"
+              className="text-sm font-semibold text-amber-600 hover:text-amber-700"
+            >
+              Explore all →
+            </Link>
+          </div>
+
+          {hasError ? (
+            <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+              Unable to load featured listings right now.
+            </p>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredSublet.map((house) => (
+                <ListingCard key={house.oid} house={house} />
+              ))}
+              {featuredSublet.length === 0 && (
                 <div className="rounded-2xl border border-dashed border-amber-200 bg-white/80 px-6 py-10 text-center text-slate-500">
                   Listings will appear here once available.
                 </div>

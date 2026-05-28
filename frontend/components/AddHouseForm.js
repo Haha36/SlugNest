@@ -179,7 +179,7 @@ export default function AddHouseForm({ token, onSuccess }) {
             htmlFor="square_feet"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Sq. Ft
+            Sq. Ft (Optional)
           </label>
           <input
             type="number"
