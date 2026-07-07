@@ -107,16 +107,13 @@ export default function SavedPage() {
     <main className="min-h-screen bg-gradient-to-b from-rose-50 via-white to-amber-50 px-4 py-16">
       <section className="mx-auto max-w-6xl">
         <header className="mb-10 flex flex-col gap-3 text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-600">
-            Your Collection
-          </p>
           <h1 className="text-4xl font-semibold text-slate-900">
             Saved Listings
           </h1>
           <p className="text-base text-slate-600">
             {savedListings.length === 0
               ? "You haven't saved any listings yet."
-              : `You have ${savedListings.length} saved ${savedListings.length === 1 ? "listing" : "listings"}.`}
+              : "If a listing is no longer available, it will be deleted automatically."}
           </p>
         </header>
 
