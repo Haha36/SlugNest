@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import ListingCard from "../components/Listing-card";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -10,13 +11,27 @@ export default function ListingsPage() {
   const [savedIds, setSavedIds] = useState(() => new Set());
   const [filter, setFilter] = useState("all");
   const { isAuthenticated, getAuthHeaders } = useAuth();
+  const { data: session } = useSession();
   const router = useRouter();
 
+  const isAuthed = isAuthenticated || !!session?.djangoAccessToken;
+
+  const getHeaders = () => {
+    if (isAuthenticated) return getAuthHeaders();
+    if (session?.djangoAccessToken) {
+      return {
+        Authorization: `Bearer ${session.djangoAccessToken}`,
+        "Content-Type": "application/json",
+      };
+    }
+    return {};
+  };
+
   const fetchSavedListings = async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthed) return;
 
     try {
-      const headers = getAuthHeaders();
+      const headers = getHeaders();
       const response = await fetch("/api/saved", {
         headers,
       });
@@ -32,7 +47,7 @@ export default function ListingsPage() {
   };
 
   const toggleSaved = async (id) => {
-    if (!isAuthenticated) {
+    if (!isAuthed) {
       router.push("/login");
       return;
     }
@@ -41,8 +56,8 @@ export default function ListingsPage() {
     const newSavedIds = new Set(savedIds);
 
     try {
-      const headers = getAuthHeaders();
-      
+      const headers = getHeaders();
+
       if (isCurrentlySaved) {
         // Unsave
         const response = await fetch("/api/saved", {
@@ -111,7 +126,7 @@ export default function ListingsPage() {
     return () => {
       isMounted = false;
     };
-  }, [isAuthenticated, filter]);
+  }, [isAuthed, filter]);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-rose-50 px-4 py-12">
