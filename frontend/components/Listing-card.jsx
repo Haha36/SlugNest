@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 const formatCurrency = (value) => {
   const numberValue = Number(value);
@@ -78,6 +79,7 @@ export default function ListingCard({ house, isSaved = false, onToggleSave }) {
       <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4 text-sm text-slate-600">
         {house.contact && (
           <button
+            type="button"
             onClick={() => setShowContactModal(true)}
             className="rounded-full bg-blue-500 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-blue-600"
           >
@@ -97,38 +99,41 @@ export default function ListingCard({ house, isSaved = false, onToggleSave }) {
       </div>
 
       {/* Contact Modal */}
-      {showContactModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
-            <button
-              onClick={() => setShowContactModal(false)}
-              className="absolute right-4 top-4 text-slate-500 transition hover:text-slate-700"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="h-6 w-6"
+      {showContactModal &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="relative w-full max-w-sm rounded-lg bg-white p-6 shadow-lg">
+              <button
+                onClick={() => setShowContactModal(false)}
+                className="absolute right-4 top-4 text-slate-500 transition hover:text-slate-700"
               >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-            <h3 className="mb-2 text-lg font-semibold text-slate-900">
-              Contact Information
-            </h3>
-            <p className="mb-4 break-words text-slate-700">{house.contact}</p>
-            <button
-              onClick={() => setShowContactModal(false)}
-              className="w-full rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white transition hover:bg-blue-600"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="h-6 w-6"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+              <h3 className="mb-2 text-lg font-semibold text-slate-900">
+                Contact Information
+              </h3>
+              <p className="mb-4 break-words text-slate-700">{house.contact}</p>
+              <button
+                onClick={() => setShowContactModal(false)}
+                className="w-full rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white transition hover:bg-blue-600"
+              >
+                Close
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
     </article>
   );
 }
